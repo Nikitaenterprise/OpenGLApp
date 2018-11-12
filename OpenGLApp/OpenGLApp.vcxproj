@@ -76,7 +76,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include;$(SolutionDir)/../GLM/glm-0.9.9.3/glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/lib/Release/Win32;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -89,7 +89,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include;$(SolutionDir)/../GLM/glm-0.9.9.3/glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/lib/Release/Win32;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -104,7 +104,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include;$(SolutionDir)/../GLM/glm-0.9.9.3/glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -121,7 +121,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include;$(SolutionDir)/../GLM/glm-0.9.9.3/glm</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
