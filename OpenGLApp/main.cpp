@@ -14,9 +14,9 @@ using std::cout;
 using std::endl;
 
 const GLint WIDTH = 800, HEIGHT = 600;
-const float toRadians = 3.14159 / 180.0f;
+const float toRadians = 3.14159f / 180.0f;
 
-GLuint VAO, VBO, shader, uniformModel;
+GLuint VAO, VBO, IBO, shader, uniformModel, uniformProjection;
 
 bool direction = true;
 float triOffset = 0.0f;
@@ -39,10 +39,11 @@ layout (location = 0) in vec3 pos;									\n\
 out vec4 vColor;													\n\
 																	\n\
 uniform mat4 model;													\n\
+uniform mat4 projection;											\n\
 																	\n\
 void main()															\n\
 {																	\n\
-	gl_Position = model * vec4(pos, 1.0);							\n\
+	gl_Position = projection * model * vec4(pos, 1.0);				\n\
 	vColor = vec4(clamp(pos, 0.0f, 1.0f), 1.0f);					\n\
 }";
 
@@ -61,14 +62,26 @@ void main()															\n\
 
 void CreateTriangle()
 {
+	GLuint indexes[] = {
+		0, 3, 1,
+		1, 3, 2,
+		2, 3, 0,
+		0, 1, 2
+	};
+
 	GLfloat verticies[] = {
 		-1.0f, -1.0f, 0.0f,
+		0.0f, -1.0f, 1.0f,
 		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
+		0.0f, 1.0f, 0.0f		
 	};
 
 	glGenVertexArrays(1, &VAO);
 	glBindVertexArray(VAO);
+
+	glGenBuffers(1, &IBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexes), indexes, GL_STATIC_DRAW);
 
 	glGenBuffers(1, &VBO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -79,6 +92,7 @@ void CreateTriangle()
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType)
@@ -141,6 +155,7 @@ void CompileShaders()
 	}
 
 	uniformModel = glGetUniformLocation(shader, "model");
+	uniformProjection = glGetUniformLocation(shader, "projection");
 }
 
 int main()
@@ -186,11 +201,15 @@ int main()
 		return 1;
 	}
 
+	glEnable(GL_DEPTH_TEST);
+
 	// Setup viewport size
 	glViewport(0, 0, bufferWidth, bufferHeight);
 
 	CreateTriangle();
 	CompileShaders();
+
+	glm::mat4 projection = glm::perspective(46.0f, (GLfloat)bufferWidth/(GLfloat)bufferHeight, 0.1f, 100.0f);
 
 	// Main loop
 	while (!glfwWindowShouldClose(mainWindow))
@@ -234,19 +253,23 @@ int main()
 
 		// Clear
 		glClearColor(1, 1, 1, 1);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		glUseProgram(shader);
 
 		glm::mat4 model(1.0);
-		//model = glm::rotate(model, toRadians * currentAngle, glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(0.4, 0.4, 1.0f));
-		//model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
+		//model = glm::rotate(model, toRadians * currentAngle, glm::vec3(0.0f, 1.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.4, 0.4, 0.4f));
+		model = glm::translate(model, glm::vec3(triOffset, triOffset, -5.0f));
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 
 		glBindVertexArray(VAO);
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 
 		glUseProgram(0);
