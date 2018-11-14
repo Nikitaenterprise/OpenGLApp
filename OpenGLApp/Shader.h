@@ -6,12 +6,19 @@
 
 #include <GL/glew.h>
 
+using std::cin;
+using std::cout;
+using std::endl;
+
 class Shader
 {
 public:
 	Shader();
 	
-	void createFromString(const char* vertexCode, const char* fragmentCode);
+	void createFromString(const char *vertexCode, const char *fragmentCode);
+	void createFromFiles(const char *vertexLocation, const char *fragmentLocation);
+
+	std::string readFile(const char *fileLocation);
 
 	GLuint getProjectionLocation();
 	GLuint getModelLocation();
@@ -24,7 +31,7 @@ public:
 private:
 	GLuint shaderID, uniformProjection, uniformModel;
 
-	void compileShader();
-	void addShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
+	void compileShader(const char *vertexCode, const char *fragmentCode);
+	void addShader(GLuint theProgram, const char *shaderCode, GLenum shaderType);
 };
 
