@@ -69,6 +69,8 @@ int Window::initialise()
 	glViewport(0, 0, bufferWidth, bufferHeight);
 
 	glfwSetWindowUserPointer(mainWindow, this);
+
+	return 0;
 }
 
 
@@ -127,4 +129,6 @@ void Window::handleMouse(GLFWwindow *window, double xPos, double yPos)
 
 	theWindow->lastX = xPos;
 	theWindow->lastY = yPos;
+
+	cout << theWindow->xChange << "\t" << theWindow->yChange << endl;
 }
