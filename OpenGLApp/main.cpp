@@ -1,3 +1,5 @@
+#define STB_IMAGE_IMPLEMENTATION
+
 #include <iostream>
 #include <string>
 #include <stdlib.h>
@@ -14,6 +16,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Camera.h"
+#include "Texture.h"
 
 using std::cin;
 using std::cout;
@@ -25,6 +28,8 @@ std::vector<Mesh*> meshVector;
 std::vector<Shader*> shaderVector;
 Window mainWindow;
 Camera camera;
+
+Texture brickTexture, dirtTexture;
 
 GLfloat dTime = 0.0f, lastTime = 0.0f;
 
@@ -44,18 +49,19 @@ void createObject()
 	};
 
 	GLfloat verticies[] = {
-		-1.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 1.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f		
+	//	x		y		z		u		v
+		-1.0f,	-1.0f,	0.0f,	0.0f,	0.0f,
+		0.0f,	-1.0f,	1.0f,	1.0f,	0.0f,
+		1.0f,	-1.0f,	0.0f,	2.0f,	0.0f,
+		0.0f,	1.0f,	0.0f,	0.5f,	1.0f
 	};
 
 	Mesh *obj = new Mesh();
-	obj->createMest(verticies, indexes, 12, 12);
+	obj->createMest(verticies, indexes, 20, 12);
 	meshVector.push_back(obj);
 
 	Mesh *obj2 = new Mesh();
-	obj2->createMest(verticies, indexes, 12, 12);
+	obj2->createMest(verticies, indexes, 20, 12);
 	meshVector.push_back(obj2);
 }
 
@@ -75,6 +81,11 @@ int main()
 	createShader();
 
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 1.0f, 0.5f);
+
+	brickTexture = Texture("Textures/brick.png");
+	brickTexture.loadTexture();
+	dirtTexture = Texture("Textures/dirt.png");
+	dirtTexture.loadTexture();
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0;
 
@@ -109,12 +120,14 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
+		brickTexture.useTexture();
 		meshVector[0]->renderMesh();
 
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, 2.0f, -2.0f));
 		model = glm::scale(model, glm::vec3(0.4, 0.4, 0.4f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		dirtTexture.useTexture();
 		meshVector[1]->renderMesh();
 
 		glUseProgram(0);

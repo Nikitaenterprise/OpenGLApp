@@ -7,6 +7,12 @@
 
 #include <GLFW/glfw3.h>
 
+#include <iostream>
+
+using std::cin;
+using std::cout;
+using std::endl;
+
 class Camera
 {
 public:

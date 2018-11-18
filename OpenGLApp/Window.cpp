@@ -129,6 +129,4 @@ void Window::handleMouse(GLFWwindow *window, double xPos, double yPos)
 
 	theWindow->lastX = xPos;
 	theWindow->lastY = yPos;
-
-	cout << theWindow->xChange << "\t" << theWindow->yChange << endl;
 }
