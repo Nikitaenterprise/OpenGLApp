@@ -17,6 +17,7 @@
 #include "Shader.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "Light.h"
 
 using std::cin;
 using std::cout;
@@ -30,6 +31,8 @@ Window mainWindow;
 Camera camera;
 
 Texture brickTexture, dirtTexture;
+
+Light light;
 
 GLfloat dTime = 0.0f, lastTime = 0.0f;
 
@@ -51,8 +54,8 @@ void createObject()
 	GLfloat verticies[] = {
 	//	x		y		z		u		v
 		-1.0f,	-1.0f,	0.0f,	0.0f,	0.0f,
-		0.0f,	-1.0f,	1.0f,	1.0f,	0.0f,
-		1.0f,	-1.0f,	0.0f,	2.0f,	0.0f,
+		0.0f,	-1.0f,	1.0f,	0.5f,	0.0f,
+		1.0f,	-1.0f,	0.0f,	1.0f,	0.0f,
 		0.0f,	1.0f,	0.0f,	0.5f,	1.0f
 	};
 
@@ -87,7 +90,9 @@ int main()
 	dirtTexture = Texture("Textures/dirt.png");
 	dirtTexture.loadTexture();
 
-	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0;
+	light = Light(glm::vec3(0.0,1.0,1.0), 0.5f);
+
+	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformAmbientIntensityLocation = 0, uniformAmbientColourLocation = 0;
 
 	glm::mat4 projection = glm::perspective(45.0f, mainWindow.getBufferWidth()/mainWindow.getBufferHeight(), 0.1f, 100.0f);
 
@@ -112,6 +117,10 @@ int main()
 		uniformModel = shaderVector[0]->getModelLocation();
 		uniformProjection = shaderVector[0]->getProjectionLocation();
 		uniformView = shaderVector[0]->getViewLocation();
+		uniformAmbientIntensityLocation = shaderVector[0]->getAmbientIntensityLocation();
+		uniformAmbientColourLocation = shaderVector[0]->getAmbientColourLocation();
+
+		light.useLight(uniformAmbientIntensityLocation, uniformAmbientColourLocation);
 
 		glm::mat4 model(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
