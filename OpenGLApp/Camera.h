@@ -22,6 +22,8 @@ public:
 	void keyControl(bool *keys, GLfloat dTime);
 	void mouseControl(GLfloat xChange, GLfloat yChange);
 
+	glm::vec3 getCameraPosition() { return position; };
+
 	glm::mat4 calculateViewMatrix();
 
 	~Camera();
