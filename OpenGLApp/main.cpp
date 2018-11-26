@@ -35,7 +35,7 @@ Texture brickTexture, dirtTexture;
 
 Material shinyMaterial, dullMaterial;
 
-Light light;
+DirectionalLight light;
 
 GLfloat dTime = 0.0f, lastTime = 0.0f;
 
@@ -135,15 +135,13 @@ int main()
 	brickTexture.loadTexture();
 	dirtTexture = Texture("Textures/dirt.png");
 	dirtTexture.loadTexture();
-
+	
 	shinyMaterial = Material(2.0f, 64);
 	dullMaterial = Material(0.3f, 4);
 
-	light = Light(glm::vec3(1.0f, 1.0f, 1.0f), 0.5f, glm::vec3(2.0f, -1.0f, -2.0f), 0.3f);
+	light = DirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.5f, 0.3f, glm::vec3(2.0f, -1.0f, -2.0f));
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
-		uniformAmbientIntensityLocation = 0, uniformAmbientColourLocation = 0,
-		uniformDirection = 0, uniformDiffuseIntensity = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
 
 	glm::mat4 projection = glm::perspective(45.0f, mainWindow.getBufferWidth()/mainWindow.getBufferHeight(), 0.1f, 100.0f);
@@ -169,15 +167,13 @@ int main()
 		uniformModel = shaderVector[0]->getModelLocation();
 		uniformProjection = shaderVector[0]->getProjectionLocation();
 		uniformView = shaderVector[0]->getViewLocation();
-		uniformAmbientIntensityLocation = shaderVector[0]->getAmbientIntensityLocation();
-		uniformAmbientColourLocation = shaderVector[0]->getAmbientColourLocation();
-		uniformDirection = shaderVector[0]->getDirectionLocation();
-		uniformDiffuseIntensity = shaderVector[0]->getDiffuseIntensityLocation();
 		uniformEyePosition = shaderVector[0]->getEyePosition();
 		uniformSpecularIntensity = shaderVector[0]->getSpecularIntensityLocation();
 		uniformShininess = shaderVector[0]->getShininessLocation();
 
-		light.useLight(uniformAmbientIntensityLocation, uniformAmbientColourLocation, uniformDiffuseIntensity, uniformDirection);
+		shaderVector[0]->setDirectionalLight(&light);
+
+		//light.useLight(uniformAmbientIntensityLocation, uniformAmbientColourLocation, uniformDiffuseIntensity, uniformDirection);
 
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.calculateViewMatrix()));
