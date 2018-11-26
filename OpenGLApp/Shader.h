@@ -68,7 +68,7 @@ private:
 		GLuint uniformConstant;
 		GLuint uniformLinear;
 		GLuint uniformExponent;
-	} uniformPointLight[MAX_POINT_LIGHTS];
+	} uniformPointLights[MAX_POINT_LIGHTS];
 
 	void compileShader(const char *vertexCode, const char *fragmentCode);
 	void addShader(GLuint theProgram, const char *shaderCode, GLenum shaderType);

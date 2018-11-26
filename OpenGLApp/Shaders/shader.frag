@@ -14,7 +14,7 @@ struct Light
 	vec3 colour;
 	float ambientIntensity;
 	float diffuseIntensity;
-}
+};
 
 struct DirectionalLight
 {
@@ -29,7 +29,7 @@ struct PointLight
 	float constant;
 	float linear;
 	float exponent;
-}
+};
 		
 struct Material
 {
@@ -37,10 +37,10 @@ struct Material
 	float shininess;
 };
 
-uniform int poinLightCount;
+uniform int pointLightCount;
 
 uniform DirectionalLight directionalLight;
-uniform PointLight pointLight[MAX_POINT_LIGHTS];
+uniform PointLight pointLights[MAX_POINT_LIGHTS];
 
 uniform sampler2D theTexture;
 uniform Material material;
@@ -53,14 +53,14 @@ vec4 calcLightByDirection(Light _light, vec3 _direction)
 {
 	vec4 ambientColour = vec4(_light.colour, 1.0f) * _light.ambientIntensity;
 
-	float diffuseFactor = max(dot(normalize(normal), normalize(direction)), 0.0f);
+	float diffuseFactor = max(dot(normalize(normal), normalize(_direction)), 0.0f);
 	vec4 diffuseColour = vec4(_light.colour, 1.0f) * _light.diffuseIntensity * diffuseFactor;
 
 	vec4 specularColour = vec4(0, 0, 0, 0);
 	if(diffuseFactor > 0.0f)
 	{
 		vec3 fragToEye = normalize(eyePosition - fragmentPosition);
-		vec3 reflectedVertex = normalize(reflect(direction, normalize(normal)));
+		vec3 reflectedVertex = normalize(reflect(_direction, normalize(normal)));
 		
 		float specularFactor = dot(fragToEye, reflectedVertex);
 		if(specularFactor > 0.0f)
@@ -80,7 +80,18 @@ vec4 calcDirectionalLight()
 
 vec4 calcPointLights()
 {
-	
+	vec4 totalColour = vec4(0, 0, 0, 0);
+	for(int i = 0; i < pointLightCount; i++)
+	{
+		vec3 direction = fragmentPosition - pointLights[i].position;
+		float distance = length(direction);
+		direction = normalize(direction);
+
+		vec4 colour = calcLightByDirection(pointLights[i].base, direction);
+		float attenuation = pointLights[i].exponent * distance * distance + pointLights[i].linear * distance + pointLights[i].constant;
+		totalColour += (colour / attenuation);
+	}
+	return totalColour;
 }
 
 void main()															
