@@ -32,7 +32,7 @@ std::vector<Shader*> shaderVector;
 Window mainWindow;
 Camera camera;
 
-Texture brickTexture, dirtTexture;
+Texture brickTexture, dirtTexture, whiteTexture;
 
 Material shinyMaterial, dullMaterial;
 
@@ -118,7 +118,21 @@ void createObject()
 			10.0f,	0.0f,	10.0f,	10.0f,	10.0f,	0.0f,	-1.0f,	0.0f
 	};
 
+	GLuint wallIndexes[] = {
+		0, 1, 2,
+		2, 3, 0
+	};
+
+	GLfloat wallVerticies[] = {
+		//	x		y		z		u		v		nx		ny		nz
+			-10.0f,	0.0f,	-10.0f,	0.0f,	0.0f,	0.0f,	0.0f,	0.0f,
+			-10.0f,	10.0f,	-10.0f,	10.0f,	0.0f,	0.0f,	0.0f,	0.0f,
+			-10.0f,	10.0f,	10.0f,	0.0f,	10.0f,	0.0f,	0.0f,	0.0f,
+			-10.0f,	0.0f,	10.0f,	10.0f,	10.0f,	0.0f,	0.0f,	0.0f
+	};
+
 	calculateAverageNormals(indexes, 12, verticies, 32, 8, 5);
+	calculateAverageNormals(wallIndexes, 6, wallVerticies, 32, 8, 5);
 
 	Mesh *obj = new Mesh();
 	obj->createMest(verticies, indexes, 32, 12);
@@ -131,6 +145,10 @@ void createObject()
 	Mesh *obj3 = new Mesh();
 	obj3->createMest(floorVerticies, floorIndexes, 32, 6);
 	meshVector.push_back(obj3);
+
+	Mesh *obj4 = new Mesh();
+	obj4->createMest(wallVerticies, wallIndexes, 32, 6);
+	meshVector.push_back(obj4);
 }
 
 void createShader()
@@ -154,6 +172,8 @@ int main()
 	brickTexture.loadTexture();
 	dirtTexture = Texture("Textures/dirt.png");
 	dirtTexture.loadTexture();
+	whiteTexture = Texture("Textures/white.png");
+	whiteTexture.loadTexture();
 	
 	shinyMaterial = Material(2.0f, 64);
 	dullMaterial = Material(0.3f, 4);
@@ -226,9 +246,16 @@ int main()
 		model = glm::mat4(1.0);
 		model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		dirtTexture.useTexture();
+		whiteTexture.useTexture();
 		dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
 		meshVector[2]->renderMesh();
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(2.0f, -2.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		whiteTexture.useTexture();
+		dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
+		meshVector[3]->renderMesh();
 
 		glUseProgram(0);
 
