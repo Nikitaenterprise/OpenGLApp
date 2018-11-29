@@ -8,6 +8,7 @@ in vec3 fragmentPosition;
 out vec4 colour;	
 
 const int MAX_POINT_LIGHTS = 3;
+const int MAX_SPOT_LIGHTS = 3;
 
 struct Light
 {
@@ -30,6 +31,13 @@ struct PointLight
 	float linear;
 	float exponent;
 };
+
+struct SpotLight
+{
+	PointLight base;
+	vec3 direction;
+	float edge;
+};
 		
 struct Material
 {
@@ -38,9 +46,11 @@ struct Material
 };
 
 uniform int pointLightCount;
+uniform int spotLightCount;
 
 uniform DirectionalLight directionalLight;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
+uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 uniform sampler2D theTexture;
 uniform Material material;
@@ -78,18 +88,49 @@ vec4 calcDirectionalLight()
 	return calcLightByDirection(directionalLight.base, directionalLight.direction);
 }
 
+vec4 calcPointLight(PointLight _pointLight)
+{
+	vec3 direction = fragmentPosition - _pointLight.position;
+	float distance = length(direction);
+	direction = normalize(direction);
+	
+	vec4 colour = calcLightByDirection(_pointLight.base, direction);
+	float attenuation = _pointLight.exponent * distance * distance + _pointLight.linear * distance + _pointLight.constant;
+	return (colour / attenuation);
+}
+
+vec4 calcSpotLight(SpotLight _spotLight)
+{
+	vec3 rayDirection = normalize(fragmentPosition - _spotLight.base.position);
+	float spotLightFactor = dot(rayDirection, _spotLight.direction);
+
+	if(spotLightFactor > _spotLight.edge)
+	{
+		vec4 colour = calcPointLight(_spotLight.base);
+		return colour * (1.0f - (1.0f - spotLightFactor)/(1.0f - _spotLight.edge)) ;
+	}
+	else
+	{
+		return vec4(0, 0, 0, 0);
+	}
+}
+
 vec4 calcPointLights()
 {
 	vec4 totalColour = vec4(0, 0, 0, 0);
 	for(int i = 0; i < pointLightCount; i++)
 	{
-		vec3 direction = fragmentPosition - pointLights[i].position;
-		float distance = length(direction);
-		direction = normalize(direction);
+		totalColour += calcPointLight(pointLights[i]);
+	}
+	return totalColour;
+}
 
-		vec4 colour = calcLightByDirection(pointLights[i].base, direction);
-		float attenuation = pointLights[i].exponent * distance * distance + pointLights[i].linear * distance + pointLights[i].constant;
-		totalColour += (colour / attenuation);
+vec4 calcSpotLights()
+{
+	vec4 totalColour = vec4(0, 0, 0, 0);
+	for(int i = 0; i < spotLightCount; i++)
+	{
+		totalColour += calcSpotLight(spotLights[i]);
 	}
 	return totalColour;
 }
@@ -98,5 +139,6 @@ void main()
 {
 	vec4 finalColour = calcDirectionalLight();
 	finalColour += calcPointLights();
+	finalColour += calcSpotLights();
 	colour = texture(theTexture, texCoord) * finalColour;
 }

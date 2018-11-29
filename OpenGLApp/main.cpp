@@ -38,6 +38,7 @@ Material shinyMaterial, dullMaterial;
 
 DirectionalLight light;
 PointLight pointLights[MAX_POINT_LIGHTS];
+SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 GLfloat dTime = 0.0f, lastTime = 0.0f;
 
@@ -166,7 +167,7 @@ int main()
 	createObject();
 	createShader();
 
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 5.0f, 0.5f);
+	camera = Camera(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 5.0f, 0.5f);
 
 	brickTexture = Texture("Textures/brick.png");
 	brickTexture.loadTexture();
@@ -178,13 +179,23 @@ int main()
 	shinyMaterial = Material(2.0f, 64);
 	dullMaterial = Material(0.3f, 4);
 
-	light = DirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.5f, 0.3f, glm::vec3(2.0f, -1.0f, -2.0f));
+	light = DirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 0.1f, glm::vec3(2.0f, -1.0f, -2.0f));
 
 	unsigned int pointLightCount = 0;
-	pointLights[0] = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), 0.3f, 1.0f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
+	pointLights[0] = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 0.1f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
 	pointLightCount++;
-	pointLights[1] = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), 0.3f, 1.4f, glm::vec3(4.0f, 2.0f, 0.0f), 0.3f, 0.1f, 0.1f);
+	pointLights[1] = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), 0.1f, 0.1f, glm::vec3(4.0f, 2.0f, 0.0f), 0.3f, 0.1f, 0.1f);
 	pointLightCount++;
+
+	unsigned int spotLightCount = 0;
+	spotLights[0] = SpotLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 1.0f, 
+		glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), 
+		1.0f, 0.0f, 0.0f, 20.0f);
+	spotLightCount++;
+	spotLights[1] = SpotLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 1.0f,
+		glm::vec3(0.0f, -1.5f, 0.0f), glm::vec3(-100.0f, -1.0f, 0.0f),
+		1.0f, 0.0f, 0.0f, 20.0f);
+	spotLightCount++;
 
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
@@ -194,7 +205,7 @@ int main()
 	// Main loop
 	while (!mainWindow.getShouldClose())
 	{
-		GLfloat now = glfwGetTime();
+		double now = glfwGetTime();
 		dTime = now - lastTime;
 		lastTime = now;
 
@@ -218,6 +229,9 @@ int main()
 
 		shaderVector[0]->setDirectionalLight(&light);
 		shaderVector[0]->setPointLights(pointLights, pointLightCount);
+		shaderVector[0]->setSpotLights(spotLights, spotLightCount);
+
+		spotLights[0].setFlash(camera.getCameraPosition() - glm::vec3(0.0f, 0.5f, 0.0f), camera.getCameraDirection());
 
 		//light.useLight(uniformAmbientIntensityLocation, uniformAmbientColourLocation, uniformDiffuseIntensity, uniformDirection);
 

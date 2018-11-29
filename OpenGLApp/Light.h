@@ -16,6 +16,7 @@ protected:
 	GLfloat diffuseIntensity;
 };
 
+
 class DirectionalLight : public Light
 {
 public:
@@ -34,6 +35,7 @@ private:
 	glm::vec3 direction;
 };
 
+
 class PointLight : public Light
 {
 public:
@@ -48,8 +50,35 @@ public:
 
 	~PointLight();
 
-private:
+protected:
 	glm::vec3 position;
 
 	GLfloat constant, linear, exponent;
+};
+
+
+class SpotLight : public PointLight
+{
+public:
+	SpotLight();
+	SpotLight(glm::vec3 _colour,
+		GLfloat _ambientIntensity, GLfloat _diffuseIntensity,
+		glm::vec3 _position, glm::vec3 _direction,
+		GLfloat _constant, GLfloat _linear, GLfloat _exponent,
+		GLfloat _edge);
+
+	void useLight(GLuint _ambienIntensityLocation,
+		GLuint _ambientColourLocation, GLuint _diffuseIntensityLocation,
+		GLuint _positionLocation, GLuint _directionLocation,
+		GLuint _constantLocation, GLuint _linearLocation, GLuint _exponentLocation,
+		GLuint _edgeLocation);
+
+	void setFlash(glm::vec3 _position, glm::vec3 _direction);
+
+	~SpotLight();
+
+private:
+	glm::vec3 direction;
+
+	GLfloat edge, procEdge;
 };

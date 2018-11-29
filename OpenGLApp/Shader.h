@@ -37,6 +37,7 @@ public:
 
 	void setDirectionalLight(DirectionalLight *_directionalLight);
 	void setPointLights(PointLight *_pointLight, unsigned int lightCount);
+	void setSpotLights(SpotLight *_spotLight, unsigned int lightCount);
 
 	void useShader();
 	void clearShader();
@@ -44,12 +45,12 @@ public:
 	~Shader();		 
 
 private:
-	int pointLightCount;
+	int pointLightCount, spotLightCount;
 
 	GLuint shaderID, uniformProjection, uniformModel, uniformEyePosition, uniformView, 
 		uniformSpecularIntensity, uniformShininess;
 
-	GLuint uniformPointLightCount;
+	GLuint uniformPointLightCount, uniformSpotLightCount;
 
 	struct
 	{
@@ -69,6 +70,20 @@ private:
 		GLuint uniformLinear;
 		GLuint uniformExponent;
 	} uniformPointLights[MAX_POINT_LIGHTS];
+
+	struct
+	{
+		GLuint uniformColour;
+		GLuint uniformAmbientIntensity;
+		GLuint uniformDiffuseIntensity;
+		GLuint uniformPosition;
+		GLuint uniformConstant;
+		GLuint uniformLinear;
+		GLuint uniformExponent;
+
+		GLuint uniformDirection;
+		GLuint uniformEdge;
+	} uniformSpotLights[MAX_SPOT_LIGHTS];
 
 	void compileShader(const char *vertexCode, const char *fragmentCode);
 	void addShader(GLuint theProgram, const char *shaderCode, GLenum shaderType);
