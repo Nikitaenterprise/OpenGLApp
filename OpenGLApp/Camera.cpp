@@ -13,7 +13,7 @@ Camera::Camera(glm::vec3 startPosition, glm::vec3 startUp, GLfloat startYaw, GLf
 	yaw = startYaw;
 	pitch = startPitch;
 
-	front = glm::vec3(0.0f, 0.0f, -1.0f);
+	front = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	moveSpeed = startMoveSpeed;
 	turnSpeed = startTurnSpeed;
@@ -53,6 +53,15 @@ void Camera::mouseControl(GLfloat xChange, GLfloat yChange)
 	update();
 }
 
+void Camera::setCameraDirection(glm::vec3 _direction)
+{
+	yaw = atanf(_direction.y / _direction.x);
+	//pitch = acos(_direction.z / glm::length(glm::normalize(_direction)));
+	pitch = asin(_direction.y);
+	//front = glm::normalize(_direction);
+	update();
+}
+
 glm::mat4 Camera::calculateViewMatrix()
 {
 	return glm::lookAt(position, position + front, up);
@@ -69,7 +78,7 @@ void Camera::update()
 	front.y = sin(glm::radians(pitch));
 	front.z = sin(glm::radians(yaw))*cos(glm::radians(pitch));
 	front = glm::normalize(front);
-
 	right = glm::normalize(glm::cross(front, worldUp));
 	up = glm::normalize(glm::cross(right, front));
+	//cout << front.x << "\t" << front.y << "\t" << front.z << "\n";
 }

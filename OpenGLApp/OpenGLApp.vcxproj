@@ -76,11 +76,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include;$(SolutionDir)/../GLM/glm-0.9.9.3/glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include;$(SolutionDir)/../GLM/glm-0.9.9.3/glm;$(SolutionDir)/../ASSIMP/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/lib/Release/Win32;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/lib/Release/Win32;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/lib-vc2015;$(SolutionDir)/../ASSIMP/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -104,13 +104,13 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include;$(SolutionDir)/../GLM/glm-0.9.9.3/glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include;$(SolutionDir)/../GLM/glm-0.9.9.3/glm;$(SolutionDir)/../ASSIMP/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/lib/Release/Win32;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/lib/Release/Win32;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/lib-vc2015;$(SolutionDir)/../ASSIMP/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -136,6 +136,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Window.cpp" />
@@ -146,6 +147,7 @@
     <ClInclude Include="Light.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />

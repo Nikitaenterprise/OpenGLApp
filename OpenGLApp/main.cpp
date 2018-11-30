@@ -20,6 +20,9 @@
 #include "Texture.h"
 #include "Light.h"
 #include "Material.h"
+#include "Model.h"
+
+#include"assimp/Importer.hpp"
 
 using std::cin;
 using std::cout;
@@ -36,11 +39,13 @@ Texture brickTexture, dirtTexture, whiteTexture;
 
 Material shinyMaterial, dullMaterial;
 
+Model starDestroyer;
+
 DirectionalLight light;
 PointLight pointLights[MAX_POINT_LIGHTS];
 SpotLight spotLights[MAX_SPOT_LIGHTS];
 
-GLfloat dTime = 0.0f, lastTime = 0.0f;
+double dTime = 0.0f, lastTime = 0.0f;
 
 // Vertex Shader
 static const char* vShader = "Shaders/shader.vert";
@@ -136,19 +141,19 @@ void createObject()
 	calculateAverageNormals(wallIndexes, 6, wallVerticies, 32, 8, 5);
 
 	Mesh *obj = new Mesh();
-	obj->createMest(verticies, indexes, 32, 12);
+	obj->createMesh(verticies, indexes, 32, 12);
 	meshVector.push_back(obj);
 
 	Mesh *obj2 = new Mesh();
-	obj2->createMest(verticies, indexes, 32, 12);
+	obj2->createMesh(verticies, indexes, 32, 12);
 	meshVector.push_back(obj2);
 
 	Mesh *obj3 = new Mesh();
-	obj3->createMest(floorVerticies, floorIndexes, 32, 6);
+	obj3->createMesh(floorVerticies, floorIndexes, 32, 6);
 	meshVector.push_back(obj3);
 
 	Mesh *obj4 = new Mesh();
-	obj4->createMest(wallVerticies, wallIndexes, 32, 6);
+	obj4->createMesh(wallVerticies, wallIndexes, 32, 6);
 	meshVector.push_back(obj4);
 }
 
@@ -167,17 +172,21 @@ int main()
 	createObject();
 	createShader();
 
-	camera = Camera(glm::vec3(0.0f, 0.0f, -5.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 5.0f, 0.5f);
+	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), 0.0f, 0.0f, 5.0f, 0.5f);
+	
 
 	brickTexture = Texture("Textures/brick.png");
-	brickTexture.loadTexture();
+	brickTexture.loadTextureA();
 	dirtTexture = Texture("Textures/dirt.png");
-	dirtTexture.loadTexture();
+	dirtTexture.loadTextureA();
 	whiteTexture = Texture("Textures/white.png");
-	whiteTexture.loadTexture();
+	whiteTexture.loadTextureA();
 	
 	shinyMaterial = Material(2.0f, 64);
 	dullMaterial = Material(0.3f, 4);
+
+	starDestroyer = Model();
+	starDestroyer.loadModel("Models/Test.obj");
 
 	light = DirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 0.1f, glm::vec3(2.0f, -1.0f, -2.0f));
 
@@ -200,7 +209,8 @@ int main()
 	GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 		uniformSpecularIntensity = 0, uniformShininess = 0;
 
-	glm::mat4 projection = glm::perspective(45.0f, mainWindow.getBufferWidth()/mainWindow.getBufferHeight(), 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(45.0f, 
+		static_cast<GLfloat>(mainWindow.getBufferWidth())/ static_cast<GLfloat>(mainWindow.getBufferHeight()), 0.1f, 100.0f);
 
 	// Main loop
 	while (!mainWindow.getShouldClose())
@@ -212,7 +222,7 @@ int main()
 		// Get & handle user inputs events
 		glfwPollEvents();
 
-		camera.keyControl(mainWindow.getKeys(), dTime);
+		camera.keyControl(mainWindow.getKeys(), static_cast<GLfloat>(dTime));
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
 		// Clear
@@ -270,6 +280,13 @@ int main()
 		whiteTexture.useTexture();
 		dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
 		meshVector[3]->renderMesh();
+
+		model = glm::mat4(1.0);
+		model = glm::translate(model, glm::vec3(2.0f, 2.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.00001f, 0.00001f, 0.00001f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
+		starDestroyer.renderModel();
 
 		glUseProgram(0);
 
