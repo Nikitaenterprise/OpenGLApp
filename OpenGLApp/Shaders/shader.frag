@@ -61,15 +61,15 @@ uniform vec3 eyePosition;
 
 
 
-float calcDirectionalShadowFactor(directionalLight _light)
+float calcDirectionalShadowFactor(DirectionalLight _light)
 {
 	vec3 projCoords = directionalLightSpacePos.xyz / directionalLightSpacePos.w;
 	projCoords = (projCoords * 0.5) + 0.5;
 
-	float closest = texture(directionalShadowMap, projCoord.xy).r;
+	float closest = texture(directionalShadowMap, projCoords.xy).r;
 	float current = projCoords.z;
 
-	float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+	float shadow = current > closest ? 1.0 : 0.0;
 
 	return shadow;
 }
