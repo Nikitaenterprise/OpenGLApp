@@ -4,6 +4,7 @@ in vec4 vColor;
 in vec2 texCoord;
 in vec3 normal;
 in vec3 fragmentPosition;
+in vec4 directionalLightSpacePos;
 																	
 out vec4 colour;	
 
@@ -53,11 +54,21 @@ uniform PointLight pointLights[MAX_POINT_LIGHTS];
 uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 uniform sampler2D theTexture;
+uniform sampler2D directionalShadowMap;
 uniform Material material;
 
 uniform vec3 eyePosition;
 
 
+
+float calcDirectionalShadowFactor(directionalLight _light)
+{
+	vec3 projCoords = directionalLightSpacePos.xyz / directionalLightSpacePos.w;
+	projCoords = (projCoords * 0.5) + 0.5;
+
+	float closest = texture(directionalShadowMap, projCoord.xy).r;
+	
+}
 
 vec4 calcLightByDirection(Light _light, vec3 _direction)
 {

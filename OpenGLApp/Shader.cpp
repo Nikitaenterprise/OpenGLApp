@@ -17,7 +17,7 @@ void Shader::createFromString(const char *vertexCode, const char *fragmentCode)
 	compileShader(vertexCode, fragmentCode);
 }
 
-void Shader::createFromFiles(const char * vertexLocation, const char * fragmentLocation)
+void Shader::createFromFiles(const char *vertexLocation, const char *fragmentLocation)
 {
 	std::string vertexString = readFile(vertexLocation);
 	std::string fragmentString = readFile(fragmentLocation);
@@ -28,7 +28,7 @@ void Shader::createFromFiles(const char * vertexLocation, const char * fragmentL
 	compileShader(vertexCode, fragmentCode);
 }
 
-std::string Shader::readFile(const char * fileLocation)
+std::string Shader::readFile(const char *fileLocation)
 {
 	std::string content;
 	std::ifstream file(fileLocation, std::ios::in);
