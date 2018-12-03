@@ -67,10 +67,14 @@ float calcDirectionalShadowFactor(directionalLight _light)
 	projCoords = (projCoords * 0.5) + 0.5;
 
 	float closest = texture(directionalShadowMap, projCoord.xy).r;
-	
+	float current = projCoords.z;
+
+	float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+
+	return shadow;
 }
 
-vec4 calcLightByDirection(Light _light, vec3 _direction)
+vec4 calcLightByDirection(Light _light, vec3 _direction, float _shadowFactor)
 {
 	vec4 ambientColour = vec4(_light.colour, 1.0f) * _light.ambientIntensity;
 
@@ -91,12 +95,13 @@ vec4 calcLightByDirection(Light _light, vec3 _direction)
 		}
 	}
 
-	return (ambientColour + diffuseColour + specularColour);
+	return (ambientColour + (1.0 - _shadowFactor) * (diffuseColour + specularColour));
 }
 
 vec4 calcDirectionalLight()
 {
-	return calcLightByDirection(directionalLight.base, directionalLight.direction);
+	float shadowFactor = calcDirectionalShadowFactor(directionalLight);
+	return calcLightByDirection(directionalLight.base, directionalLight.direction, shadowFactor);
 }
 
 vec4 calcPointLight(PointLight _pointLight)
@@ -105,7 +110,7 @@ vec4 calcPointLight(PointLight _pointLight)
 	float distance = length(direction);
 	direction = normalize(direction);
 	
-	vec4 colour = calcLightByDirection(_pointLight.base, direction);
+	vec4 colour = calcLightByDirection(_pointLight.base, direction, 0.0f);
 	float attenuation = _pointLight.exponent * distance * distance + _pointLight.linear * distance + _pointLight.constant;
 	return (colour / attenuation);
 }

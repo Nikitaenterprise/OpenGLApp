@@ -3,17 +3,25 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
+#include "ShadowMap.h"
+
 class Light
 {
 public:
 	Light();
 	Light(glm::vec3 _colour, GLfloat _ambientIntensity, GLfloat _diffuseIntensity);
 
+	ShadowMap *getShadowMap() { return shadowMap; };
+
 	~Light();
 protected:
 	glm::vec3 colour;
 	GLfloat ambientIntensity;
 	GLfloat diffuseIntensity;
+
+	glm::mat4 lightProjection;
+
+	ShadowMap *shadowMap;
 };
 
 
