@@ -9,8 +9,11 @@ Light::Light()
 	diffuseIntensity = 0.0f;
 }
 
-Light::Light(glm::vec3 _colour, GLfloat _ambientIntensity, GLfloat _diffuseIntensity)
+Light::Light(GLfloat _shadowWidth, GLfloat _shadowHeight, glm::vec3 _colour, GLfloat _ambientIntensity, GLfloat _diffuseIntensity)
 {
+	shadowMap = new ShadowMap();
+	shadowMap->init(_shadowWidth, _shadowHeight);
+
 	colour = _colour;
 	ambientIntensity = _ambientIntensity;
 	diffuseIntensity = _diffuseIntensity;
@@ -25,11 +28,13 @@ DirectionalLight::DirectionalLight() : Light()
 	direction = glm::vec3(0.0f, -1.0f, 0.0f);
 }
 
-DirectionalLight::DirectionalLight(glm::vec3 _colour, 
+DirectionalLight::DirectionalLight(GLfloat _shadowWidth, GLfloat _shadowHeight, 
+	glm::vec3 _colour,
 	GLfloat _ambientIntensity, GLfloat _diffuseIntensity, 
-	glm::vec3 _direction) : Light(_colour, _ambientIntensity, _diffuseIntensity)
+	glm::vec3 _direction) : Light(_shadowWidth,  _shadowHeight, _colour, _ambientIntensity, _diffuseIntensity)
 {
 	direction = _direction;
+	lightProjection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 0.1f, 20.0f);
 }
 
 void DirectionalLight::useLight(GLuint _ambienIntensityLocation, GLuint _ambientColourLocation, 
@@ -40,6 +45,11 @@ void DirectionalLight::useLight(GLuint _ambienIntensityLocation, GLuint _ambient
 
 	glUniform3f(_directionLocation, direction.x, direction.y, direction.z);
 	glUniform1f(_diffuseIntensityLocation, diffuseIntensity);
+}
+
+glm::mat4 DirectionalLight::calculateLightTransform()
+{
+	return lightProjection * glm::lookAt(-direction, glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 DirectionalLight::~DirectionalLight()
@@ -57,7 +67,7 @@ PointLight::PointLight() : Light()
 PointLight::PointLight(glm::vec3 _colour,
 	GLfloat _ambientIntensity, GLfloat _diffuseIntensity,
 	glm::vec3 _position, GLfloat _constant, GLfloat _linear, GLfloat _exponent) : 
-	Light(_colour, _ambientIntensity, _diffuseIntensity)
+	Light(1024, 1024, _colour, _ambientIntensity, _diffuseIntensity)
 {
 	position = _position;
 	constant = _constant;

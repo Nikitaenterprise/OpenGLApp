@@ -32,6 +32,9 @@ const float toRadians = 3.14159f / 180.0f;
 
 std::vector<Mesh*> meshVector;
 std::vector<Shader*> shaderVector;
+
+Shader directionalShadowShader;
+
 Window mainWindow;
 Camera camera;
 
@@ -162,6 +165,9 @@ void createShader()
 	Shader *shader = new Shader();
 	shader->createFromFiles(vShader, fShader);
 	shaderVector.push_back(shader);
+
+	directionalShadowShader = Shader();
+	directionalShadowShader.createFromFiles("Shaders/directional_shadow_map.vert", "Shaders/directional_shadow_map.frag");
 }
 
 int main()
