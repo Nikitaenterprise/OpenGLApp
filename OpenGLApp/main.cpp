@@ -140,8 +140,8 @@ void createObject()
 	GLfloat wallVerticies[] = {
 		//	x		y		z		u		v		nx		ny		nz
 			-10.0f,	0.0f,	-10.0f,	0.0f,	0.0f,	0.0f,	0.0f,	0.0f,
-			-10.0f,	10.0f,	-10.0f,	10.0f,	0.0f,	0.0f,	0.0f,	0.0f,
-			-10.0f,	10.0f,	10.0f,	0.0f,	10.0f,	0.0f,	0.0f,	0.0f,
+			-10.0f,	3.0f,	-10.0f,	10.0f,	0.0f,	0.0f,	0.0f,	0.0f,
+			-10.0f,	3.0f,	10.0f,	0.0f,	10.0f,	0.0f,	0.0f,	0.0f,
 			-10.0f,	0.0f,	10.0f,	10.0f,	10.0f,	0.0f,	0.0f,	0.0f
 	};
 
@@ -209,7 +209,7 @@ void renderScene()
 	meshVector[3]->renderMesh();
 
 	model = glm::mat4(1.0);
-	model = glm::translate(model, glm::vec3(2.0f, 2.0f, 0.0f));
+	model = glm::translate(model, glm::vec3(5.0f, 2.0f, 0.0f));
 	model = glm::scale(model, glm::vec3(0.00001f, 0.00001f, 0.00001f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
@@ -262,7 +262,7 @@ void renderPass(glm::mat4 _projectionMatrix, glm::mat4 _viewMatrix)
 	shaderVector[0]->setTexture(0);
 	shaderVector[0]->setDirectionalShadowMap(1);
 
-	spotLights[0].setFlash(camera.getCameraPosition() - glm::vec3(0.0f, 0.5f, 0.0f), camera.getCameraDirection());
+	//spotLights[0].setFlash(camera.getCameraPosition() - glm::vec3(0.0f, 0.5f, 0.0f), camera.getCameraDirection());
 
 	renderScene();
 }
@@ -291,7 +291,7 @@ int main()
 	starDestroyer = Model();
 	starDestroyer.loadModel("Models/Test.obj");
 
-	light = DirectionalLight(1024, 1024, glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 0.1f, glm::vec3(2.0f, -1.0f, -2.0f));
+	light = DirectionalLight(1024, 1024, glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 0.6f, glm::vec3(0.0f, -15.0f, -10.0f));
 
 	pointLights[0] = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 0.1f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
 	pointLightCount++;

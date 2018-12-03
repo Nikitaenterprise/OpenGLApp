@@ -34,7 +34,7 @@ DirectionalLight::DirectionalLight(GLfloat _shadowWidth, GLfloat _shadowHeight,
 	glm::vec3 _direction) : Light(_shadowWidth,  _shadowHeight, _colour, _ambientIntensity, _diffuseIntensity)
 {
 	direction = _direction;
-	lightProjection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, 0.1f, 20.0f);
+	lightProjection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 100.0f);
 }
 
 void DirectionalLight::useLight(GLuint _ambienIntensityLocation, GLuint _ambientColourLocation, 
