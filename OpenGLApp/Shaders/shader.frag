@@ -55,6 +55,7 @@ uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 uniform sampler2D theTexture;
 uniform sampler2D directionalShadowMap;
+
 uniform Material material;
 
 uniform vec3 eyePosition;
@@ -66,10 +67,26 @@ float calcDirectionalShadowFactor(DirectionalLight _light)
 	vec3 projCoords = directionalLightSpacePos.xyz / directionalLightSpacePos.w;
 	projCoords = (projCoords * 0.5) + 0.5;
 
-	float closest = texture(directionalShadowMap, projCoords.xy).r;
 	float current = projCoords.z;
 
-	float shadow = current > closest ? 1.0 : 0.0;
+	vec3 normalized = normalize(normal);
+	vec3 lightDirection = normalize(_light.direction);
+	
+	float bias = max(0.05 * (1 - dot(normalized, lightDirection)), 0.005);
+
+	float shadow = 0.0f;
+
+	vec2 texelSize = 1.0 / textureSize(directionalShadowMap, 0);
+	for (int x = -1; x <= 1; x++)
+	{
+		for (int y = -1; y <= 1; y++)
+		{
+			float pcfDepth = texture(directionalShadowMap, projCoords.xy + vec2(x,y) * texelSize).r;
+			shadow += (current - bias) > pcfDepth ? 1.0 : 0.0;
+		}
+	}
+
+	shadow /= 9.0f;
 
 	if(projCoords.z > 1.0)
 	{

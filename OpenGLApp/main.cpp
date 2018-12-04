@@ -51,7 +51,8 @@ unsigned int pointLightCount = 0;
 unsigned int spotLightCount = 0;
 
 GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
-uniformSpecularIntensity = 0, uniformShininess = 0;
+uniformSpecularIntensity = 0, uniformShininess = 0,
+uniformDirectionalLightTransform = 0;
 
 double dTime = 0.0f, lastTime = 0.0f;
 
@@ -175,14 +176,14 @@ void createShader()
 	directionalShadowShader.createFromFiles("Shaders/directional_shadow_map.vert", "Shaders/directional_shadow_map.frag");
 }
 
+float starDestroyerAngle = 0.0f;
+
 void renderScene()
 {
 	glm::mat4 model(1.0);
 
 	model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.0f));
-
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-
 	brickTexture.useTexture();
 	shinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
 	meshVector[0]->renderMesh();
@@ -208,11 +209,17 @@ void renderScene()
 	dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
 	meshVector[3]->renderMesh();
 
+	starDestroyerAngle += 0.1f;
+	if (starDestroyerAngle > 360.0f)
+		starDestroyerAngle = 0.1f;
+
 	model = glm::mat4(1.0);
+	model = glm::rotate(model, starDestroyerAngle * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 	model = glm::translate(model, glm::vec3(5.0f, 2.0f, 0.0f));
+	model = glm::rotate(model, 20.0f * toRadians, glm::vec3(0.0f, 1.0f, 1.0f));
 	model = glm::scale(model, glm::vec3(0.00001f, 0.00001f, 0.00001f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
+	shinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
 	starDestroyer.renderModel();
 }
 
@@ -285,13 +292,13 @@ int main()
 	whiteTexture = Texture("Textures/white.png");
 	whiteTexture.loadTextureA();
 	
-	shinyMaterial = Material(2.0f, 64);
+	shinyMaterial = Material(4.0f, 256);
 	dullMaterial = Material(0.3f, 4);
 
 	starDestroyer = Model();
 	starDestroyer.loadModel("Models/Test.obj");
 
-	light = DirectionalLight(1024, 1024, glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 0.6f, glm::vec3(0.0f, -15.0f, -10.0f));
+	light = DirectionalLight(2048, 2048, glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 0.3f, glm::vec3(0.0f, -15.0f, -10.0f));
 
 	pointLights[0] = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 0.1f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
 	pointLightCount++;
