@@ -19,29 +19,31 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="CommonValues.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Model.h" />
-    <ClInclude Include="Shader.h" />
-    <ClInclude Include="ShadowMap.h" />
-    <ClInclude Include="stb_image.h" />
-    <ClInclude Include="Texture.h" />
-    <ClInclude Include="Window.h" />
+    <ClInclude Include="include\Camera.h" />
+    <ClInclude Include="include\CommonValues.h" />
+    <ClInclude Include="include\Light.h" />
+    <ClInclude Include="include\Material.h" />
+    <ClInclude Include="include\Mesh.h" />
+    <ClInclude Include="include\Model.h" />
+    <ClInclude Include="include\OmniShadowMap.h" />
+    <ClInclude Include="include\Shader.h" />
+    <ClInclude Include="include\ShadowMap.h" />
+    <ClInclude Include="include\stb_image.h" />
+    <ClInclude Include="include\Texture.h" />
+    <ClInclude Include="include\Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Light.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Model.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="ShadowMap.cpp" />
-    <ClCompile Include="Texture.cpp" />
-    <ClCompile Include="Window.cpp" />
+    <ClCompile Include="src\Camera.cpp" />
+    <ClCompile Include="src\Light.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Model.cpp" />
+    <ClCompile Include="src\OmniShadowMap.cpp" />
+    <ClCompile Include="src\Shader.cpp" />
+    <ClCompile Include="src\ShadowMap.cpp" />
+    <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -138,12 +140,12 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include;$(SolutionDir)/../GLM/glm-0.9.9.3/glm;$(SolutionDir)/../ASSIMP/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/include;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/include;$(SolutionDir)/../GLM/glm-0.9.9.3/glm;$(SolutionDir)/../ASSIMP/include;$(ProjectDir)src;$(ProjectDir)include;$(ProjectDir)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/lib/Release/Win32;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/lib-vc2015;$(SolutionDir)/../ASSIMP/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)/../GLEW/glew-2.1.0/lib/Release/Win32;$(SolutionDir)/../GLFW/glfw-3.2.1.bin.WIN32/lib-vc2015;$(SolutionDir)/../ASSIMP/lib;$(ProjectDir)src;$(ProjectDir)include;$(ProjectDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

@@ -34,6 +34,7 @@ std::vector<Mesh*> meshVector;
 std::vector<Shader*> shaderVector;
 
 Shader directionalShadowShader;
+Shader omniShadowShader;
 
 Window mainWindow;
 Camera camera;
@@ -52,7 +53,8 @@ unsigned int spotLightCount = 0;
 
 GLuint uniformProjection = 0, uniformModel = 0, uniformView = 0, uniformEyePosition = 0,
 uniformSpecularIntensity = 0, uniformShininess = 0,
-uniformDirectionalLightTransform = 0;
+uniformDirectionalLightTransform = 0,
+uniformOmniLightPosition = 0, uniformFarPlane = 0;
 
 double dTime = 0.0f, lastTime = 0.0f;
 
@@ -172,8 +174,9 @@ void createShader()
 	shader->createFromFiles(vShader, fShader);
 	shaderVector.push_back(shader);
 
-	directionalShadowShader = Shader();
+	//directionalShadowShader = Shader();
 	directionalShadowShader.createFromFiles("Shaders/directional_shadow_map.vert", "Shaders/directional_shadow_map.frag");
+	omniShadowShader.createFromFiles("Shaders/omni_shadow_map.vert", "Shaders/omni_shadow_map.frag", "Shaders/omni_shadow_map.geom");
 }
 
 float starDestroyerAngle = 0.0f;
@@ -240,6 +243,28 @@ void directionalShadowMapPass(DirectionalLight *_light)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void omniShadowMapPass(PointLight *_light)
+{
+	omniShadowShader.useShader();
+
+	glViewport(0, 0, _light->getShadowMap()->getShadowWidht(), _light->getShadowMap()->getShadowHeight());
+
+	_light->getShadowMap()->write();
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	uniformModel = omniShadowShader.getModelLocation();
+	uniformOmniLightPosition = omniShadowShader.getOmniLightPositionLocation();
+	uniformFarPlane = omniShadowShader.getFarPlaneLocation();
+
+	glUniform3f(uniformOmniLightPosition, _light->getPosition().x, _light->getPosition().y, _light->getPosition().z);
+	glUniform1f(uniformFarPlane, _light->getFarPlane());
+	omniShadowShader.setLightMatrices(_light->calculateLightTransform());
+
+	renderScene();
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 void renderPass(glm::mat4 _projectionMatrix, glm::mat4 _viewMatrix)
 {
 	shaderVector[0]->useShader();
@@ -298,23 +323,28 @@ int main()
 	starDestroyer = Model();
 	starDestroyer.loadModel("Models/Test.obj");
 
-	light = DirectionalLight(2048, 2048, glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 0.3f, glm::vec3(0.0f, -15.0f, -10.0f));
+	light = DirectionalLight(2048, 2048, 
+		glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 0.3f, glm::vec3(0.0f, -15.0f, -10.0f));
 
-	pointLights[0] = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 0.1f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
+	pointLights[0] = PointLight(1024, 1024, 0.01f, 100.0f, 
+		glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 0.1f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
 	pointLightCount++;
-	pointLights[1] = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), 0.1f, 0.1f, glm::vec3(4.0f, 2.0f, 0.0f), 0.3f, 0.1f, 0.1f);
+	pointLights[1] = PointLight(1024, 1024, 0.01f, 100.0f, 
+		glm::vec3(0.0f, 0.0f, 1.0f), 0.1f, 0.1f, glm::vec3(4.0f, 2.0f, 0.0f), 0.3f, 0.1f, 0.1f);
 	pointLightCount++;
 	
-	spotLights[0] = SpotLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 1.0f, 
+	spotLights[0] = SpotLight(1024, 1024, 0.01f, 100.0f, 
+		glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 1.0f,
 		glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), 
 		1.0f, 0.0f, 0.0f, 20.0f);
 	spotLightCount++;
-	spotLights[1] = SpotLight(glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 1.0f,
+	spotLights[1] = SpotLight(1024, 1024, 0.01f, 100.0f, 
+		glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 1.0f,
 		glm::vec3(0.0f, -1.5f, 0.0f), glm::vec3(-100.0f, -1.0f, 0.0f),
 		1.0f, 0.0f, 0.0f, 20.0f);
 	spotLightCount++;
 
-	glm::mat4 projection = glm::perspective(45.0f, 
+	glm::mat4 projection = glm::perspective(glm::radians(60.0f), 
 		static_cast<GLfloat>(mainWindow.getBufferWidth())/ static_cast<GLfloat>(mainWindow.getBufferHeight()), 0.1f, 100.0f);
 
 	// Main loop
@@ -331,6 +361,11 @@ int main()
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
 
 		directionalShadowMapPass(&light);
+		for (size_t i = 0; i < pointLightCount; i++)
+			omniShadowMapPass(&pointLights[i]);
+		for (size_t i = 0; i < spotLightCount; i++)
+			omniShadowMapPass(&spotLights[i]);
+
 		renderPass(projection, camera.calculateViewMatrix());
 
 		glUseProgram(0);

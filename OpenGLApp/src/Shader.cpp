@@ -28,6 +28,19 @@ void Shader::createFromFiles(const char *vertexLocation, const char *fragmentLoc
 	compileShader(vertexCode, fragmentCode);
 }
 
+void Shader::createFromFiles(const char * vertexLocation, const char * fragmentLocation, const char * geometryLocation)
+{
+	std::string vertexString = readFile(vertexLocation);
+	std::string fragmentString = readFile(fragmentLocation);
+	std::string geometryString = readFile(geometryLocation);
+
+	const char *vertexCode = vertexString.c_str();
+	const char *fragmentCode = fragmentString.c_str();
+	const char *geometryCode = geometryString.c_str();
+
+	compileShader(vertexCode, fragmentCode, geometryCode);
+}
+
 std::string Shader::readFile(const char *fileLocation)
 {
 	std::string content;
@@ -102,6 +115,12 @@ void Shader::setDirectionalLightTransform(glm::mat4 *_lightTransform)
 	glUniformMatrix4fv(uniformDirectionalLightTransform, 1, GL_FALSE, glm::value_ptr(*_lightTransform));
 }
 
+void Shader::setLightMatrices(std::vector<glm::mat4> _lightMatrices)
+{
+	for (size_t i = 0; i < 6; i++)
+		glUniformMatrix4fv(uniformLightMatrices[i], 1, GL_FALSE, glm::value_ptr(_lightMatrices[i]));
+}
+
 void Shader::useShader()
 {
 	glUseProgram(shaderID);
@@ -137,6 +156,53 @@ void Shader::compileShader(const char *vertexCode, const char *fragmentCode)
 	addShader(shaderID, vertexCode, GL_VERTEX_SHADER);
 	addShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
 
+	compileProgram();
+}
+
+void Shader::compileShader(const char *vertexCode, const char *fragmentCode, const char *geometryCode)
+{
+	shaderID = glCreateProgram();
+	if (!shaderID)
+	{
+		cout << "Error creating shader program\n";
+		return;
+	}
+
+	addShader(shaderID, vertexCode, GL_VERTEX_SHADER);
+	addShader(shaderID, fragmentCode, GL_FRAGMENT_SHADER);
+	addShader(shaderID, geometryCode, GL_GEOMETRY_SHADER);
+
+	compileProgram();
+}
+
+void Shader::addShader(GLuint theProgram, const char *shaderCode, GLenum shaderType)
+{
+	GLuint theShader = glCreateShader(shaderType);
+	const GLchar* theCode[1];
+	theCode[0] = shaderCode;
+
+	GLint codeLength[1];
+	codeLength[0] = strlen(shaderCode);
+
+	glShaderSource(theShader, 1, theCode, codeLength);
+	glCompileShader(theShader);
+
+	GLint result = 0;
+	GLchar eLog[1024] = { 0 };
+
+	glGetShaderiv(theShader, GL_COMPILE_STATUS, &result);
+	if (!result)
+	{
+		glGetShaderInfoLog(theShader, sizeof(eLog), NULL, eLog);
+		cout << "Error compiling the " << shaderType << " shader: " << eLog << endl;
+		return;
+	}
+
+	glAttachShader(theProgram, theShader);
+}
+
+void Shader::compileProgram()
+{
 	GLint result = 0;
 	GLchar eLog[1024] = { 0 };
 
@@ -233,30 +299,13 @@ void Shader::compileShader(const char *vertexCode, const char *fragmentCode)
 	uniformDirectionalLightTransform = glGetUniformLocation(shaderID, "directionalLightTransform");
 	uniformDirectionalShadowMap = glGetUniformLocation(shaderID, "directionalShadowMap");
 
-}
+	uniformOmniLightPosition = glGetUniformLocation(shaderID, "lightPosition");
+	uniformFarPlane = glGetUniformLocation(shaderID, "farPlane");
 
-void Shader::addShader(GLuint theProgram, const char *shaderCode, GLenum shaderType)
-{
-	GLuint theShader = glCreateShader(shaderType);
-	const GLchar* theCode[1];
-	theCode[0] = shaderCode;
-
-	GLint codeLength[1];
-	codeLength[0] = strlen(shaderCode);
-
-	glShaderSource(theShader, 1, theCode, codeLength);
-	glCompileShader(theShader);
-
-	GLint result = 0;
-	GLchar eLog[1024] = { 0 };
-
-	glGetShaderiv(theShader, GL_COMPILE_STATUS, &result);
-	if (!result)
+	for (size_t i = 0; i < 6; i++)
 	{
-		glGetShaderInfoLog(theShader, sizeof(eLog), NULL, eLog);
-		cout << "Error compiling the " << shaderType << " shader: " << eLog << endl;
-		return;
+		char locBuff[100] = { '\0' };
+		snprintf(locBuff, sizeof(locBuff), "lightMatrices[%i]", i);
+		uniformLightMatrices[i] = glGetUniformLocation(shaderID, locBuff);
 	}
-
-	glAttachShader(theProgram, theShader);
 }

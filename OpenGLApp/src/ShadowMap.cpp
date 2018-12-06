@@ -1,7 +1,5 @@
 #include "ShadowMap.h"
 
-
-
 ShadowMap::ShadowMap()
 {
 	FBO = 0;
@@ -54,7 +52,6 @@ void ShadowMap::read(GLenum _textureUnit)
 	glActiveTexture(_textureUnit);
 	glBindTexture(GL_TEXTURE_2D, shadowMap);
 }
-
 
 ShadowMap::~ShadowMap()
 {

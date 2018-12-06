@@ -12,7 +12,7 @@ Light::Light()
 Light::Light(GLfloat _shadowWidth, GLfloat _shadowHeight, glm::vec3 _colour, GLfloat _ambientIntensity, GLfloat _diffuseIntensity)
 {
 	shadowMap = new ShadowMap();
-	shadowMap->init(_shadowWidth, _shadowHeight);
+	shadowMap->init(static_cast<GLuint>(_shadowWidth), static_cast<GLuint>(_shadowHeight));
 
 	colour = _colour;
 	ambientIntensity = _ambientIntensity;
@@ -64,15 +64,24 @@ PointLight::PointLight() : Light()
 	exponent = 0.0f;
 }
 
-PointLight::PointLight(glm::vec3 _colour,
+PointLight::PointLight(GLfloat _shadowWidth, GLfloat _shadowHeight,
+	GLfloat _near, GLfloat _far, 
+	glm::vec3 _colour,
 	GLfloat _ambientIntensity, GLfloat _diffuseIntensity,
 	glm::vec3 _position, GLfloat _constant, GLfloat _linear, GLfloat _exponent) : 
-	Light(1024, 1024, _colour, _ambientIntensity, _diffuseIntensity)
+	Light(_shadowWidth, _shadowHeight, _colour, _ambientIntensity, _diffuseIntensity)
 {
 	position = _position;
 	constant = _constant;
 	linear = _linear;
 	exponent = _exponent;
+
+	farPlane = _far;
+	float aspect = _shadowWidth / _shadowHeight;
+	lightProjection = glm::perspective(glm::radians(90.0f), aspect, _near, farPlane);
+
+	shadowMap = new OmniShadowMap();
+	shadowMap->init(static_cast<GLuint>(_shadowWidth), static_cast<GLuint>(_shadowHeight));
 }
 
 void PointLight::useLight(GLuint _ambienIntensityLocation, GLuint _ambientColourLocation, 
@@ -89,6 +98,22 @@ void PointLight::useLight(GLuint _ambienIntensityLocation, GLuint _ambientColour
 	glUniform1f(_exponentLocation, exponent);
 }
 
+std::vector<glm::mat4> PointLight::calculateLightTransform()
+{
+	std::vector<glm::mat4> lightMatrices;
+	// +x, -x
+	lightMatrices.push_back(lightProjection*glm::lookAt(position, position + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0)));
+	lightMatrices.push_back(lightProjection*glm::lookAt(position, position + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+	// +y, -y
+	lightMatrices.push_back(lightProjection*glm::lookAt(position, position + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+	lightMatrices.push_back(lightProjection*glm::lookAt(position, position + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+	// +z, -z
+	lightMatrices.push_back(lightProjection*glm::lookAt(position, position + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+	lightMatrices.push_back(lightProjection*glm::lookAt(position, position + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+
+	return lightMatrices;
+}
+
 PointLight::~PointLight()
 {
 }
@@ -101,11 +126,13 @@ SpotLight::SpotLight() : PointLight()
 	procEdge = cosf(glm::radians(edge));
 }
 
-SpotLight::SpotLight(glm::vec3 _colour,
+SpotLight::SpotLight(GLfloat _shadowWidth, GLfloat _shadowHeight,
+	GLfloat _near, GLfloat _far, 
+	glm::vec3 _colour,
 	GLfloat _ambientIntensity, GLfloat _diffuseIntensity,
 	glm::vec3 _position, glm::vec3 _direction,
 	GLfloat _constant, GLfloat _linear, GLfloat _exponent,
-	GLfloat _edge) : PointLight(_colour, _ambientIntensity, _diffuseIntensity, _position, _constant, _linear, _exponent)
+	GLfloat _edge) : PointLight(_shadowWidth, _shadowHeight, _near, _far, _colour, _ambientIntensity, _diffuseIntensity, _position, _constant, _linear, _exponent)
 {
 	direction = glm::normalize(_direction);
 	edge = _edge;
