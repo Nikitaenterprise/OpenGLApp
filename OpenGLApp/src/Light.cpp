@@ -81,7 +81,7 @@ PointLight::PointLight(GLfloat _shadowWidth, GLfloat _shadowHeight,
 	lightProjection = glm::perspective(glm::radians(90.0f), aspect, _near, farPlane);
 
 	shadowMap = new OmniShadowMap();
-	shadowMap->init(static_cast<GLuint>(_shadowWidth), static_cast<GLuint>(_shadowHeight));
+	shadowMap->init(_shadowWidth, _shadowHeight);
 }
 
 void PointLight::useLight(GLuint _ambienIntensityLocation, GLuint _ambientColourLocation, 
@@ -102,7 +102,7 @@ std::vector<glm::mat4> PointLight::calculateLightTransform()
 {
 	std::vector<glm::mat4> lightMatrices;
 	// +x, -x
-	lightMatrices.push_back(lightProjection*glm::lookAt(position, position + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0)));
+	lightMatrices.push_back(lightProjection*glm::lookAt(position, position + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
 	lightMatrices.push_back(lightProjection*glm::lookAt(position, position + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
 	// +y, -y
 	lightMatrices.push_back(lightProjection*glm::lookAt(position, position + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
@@ -124,6 +124,7 @@ SpotLight::SpotLight() : PointLight()
 	direction = glm::vec3(0.0f, -1.0f, 0.0f);
 	edge = 0.0f;
 	procEdge = cosf(glm::radians(edge));
+	isOn = true;
 }
 
 SpotLight::SpotLight(GLfloat _shadowWidth, GLfloat _shadowHeight,
@@ -146,8 +147,18 @@ void SpotLight::useLight(GLuint _ambienIntensityLocation,
 	GLuint _edgeLocation)
 {
 	glUniform3f(_ambientColourLocation, colour.x, colour.y, colour.z);
-	glUniform1f(_ambienIntensityLocation, ambientIntensity);
-	glUniform1f(_diffuseIntensityLocation, diffuseIntensity);
+
+	if (isOn)
+	{
+		glUniform1f(_ambienIntensityLocation, ambientIntensity);
+		glUniform1f(_diffuseIntensityLocation, diffuseIntensity);
+	}
+	else
+	{
+		glUniform1f(_ambienIntensityLocation, 0.0f);
+		glUniform1f(_diffuseIntensityLocation, 0.0f);
+	}
+	
 
 	glUniform3f(_positionLocation, position.x, position.y, position.z);
 	glUniform1f(_constantLocation, constant);

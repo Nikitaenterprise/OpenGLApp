@@ -1,7 +1,5 @@
 #include "Shader.h"
 
-
-
 Shader::Shader()
 {
 	shaderID = 0;
@@ -10,6 +8,14 @@ Shader::Shader()
 	uniformView = 0;
 	pointLightCount = 0;
 	spotLightCount = 0;
+	uniformEyePosition = 0;
+	uniformSpecularIntensity = 0;
+	uniformShininess = 0;
+	uniformTexture = 0;
+	uniformDirectionalLightTransform = 0;
+	uniformDirectionalShadowMap = 0;
+	uniformOmniLightPosition = 0;
+	uniformFarPlane = 0;
 }
 
 void Shader::createFromString(const char *vertexCode, const char *fragmentCode)
@@ -157,6 +163,17 @@ void Shader::clearShader()
 	}
 	uniformModel = 0;
 	uniformProjection = 0;
+	uniformView = 0;
+	pointLightCount = 0;
+	spotLightCount = 0;
+	uniformEyePosition = 0;
+	uniformSpecularIntensity = 0;
+	uniformShininess = 0;
+	uniformTexture = 0;
+	uniformDirectionalLightTransform = 0;
+	uniformDirectionalShadowMap = 0;
+	uniformOmniLightPosition = 0;
+	uniformFarPlane = 0;
 }
 
 
@@ -236,7 +253,7 @@ void Shader::compileProgram()
 		cout << "Error linking program: " << eLog << endl;
 		return;
 	}
-
+	
 	uniformModel = glGetUniformLocation(shaderID, "model");
 	uniformProjection = glGetUniformLocation(shaderID, "projection");
 	uniformView = glGetUniformLocation(shaderID, "view");
@@ -314,6 +331,8 @@ void Shader::compileProgram()
 
 	uniformOmniLightPosition = glGetUniformLocation(shaderID, "lightPosition");
 	uniformFarPlane = glGetUniformLocation(shaderID, "farPlane");
+
+	cout <<"shader:"<< uniformOmniLightPosition << "\t" << uniformFarPlane << "\t"<<shaderID << endl;
 
 	for (size_t i = 0; i < 6; i++)
 	{

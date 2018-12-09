@@ -174,8 +174,9 @@ void createShader()
 	shader->createFromFiles(vShader, fShader);
 	shaderVector.push_back(shader);
 
-	//directionalShadowShader = Shader();
+	directionalShadowShader = Shader();
 	directionalShadowShader.createFromFiles("Shaders/directional_shadow_map.vert", "Shaders/directional_shadow_map.frag");
+	omniShadowShader = Shader();
 	omniShadowShader.createFromFiles("Shaders/omni_shadow_map.vert", "Shaders/omni_shadow_map.frag", "Shaders/omni_shadow_map.geom");
 }
 
@@ -247,21 +248,21 @@ void directionalShadowMapPass(DirectionalLight *_light)
 
 void omniShadowMapPass(PointLight *_light)
 {
-	omniShadowShader.useShader();
-
 	glViewport(0, 0, _light->getShadowMap()->getShadowWidht(), _light->getShadowMap()->getShadowHeight());
-
-	_light->getShadowMap()->write();
-	glClear(GL_DEPTH_BUFFER_BIT);
-
+	
+	omniShadowShader.useShader();
 	uniformModel = omniShadowShader.getModelLocation();
 	uniformOmniLightPosition = omniShadowShader.getOmniLightPositionLocation();
 	uniformFarPlane = omniShadowShader.getFarPlaneLocation();
 
+	_light->getShadowMap()->write();
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+
 	glUniform3f(uniformOmniLightPosition, _light->getPosition().x, _light->getPosition().y, _light->getPosition().z);
 	glUniform1f(uniformFarPlane, _light->getFarPlane());
-	omniShadowShader.setLightMatrices(_light->calculateLightTransform());
 
+	omniShadowShader.setLightMatrices(_light->calculateLightTransform());
 	omniShadowShader.validate();
 
 	renderScene();
@@ -365,6 +366,12 @@ int main()
 
 		camera.keyControl(mainWindow.getKeys(), static_cast<GLfloat>(dTime));
 		camera.mouseControl(mainWindow.getXChange(), mainWindow.getYChange());
+
+		if (mainWindow.getKeys()[GLFW_KEY_F])
+		{
+			spotLights[0].toggle();
+			mainWindow.getKeys()[GLFW_KEY_F] = false;
+		}
 
 		directionalShadowMapPass(&light);
 		for (size_t i = 0; i < pointLightCount; i++)

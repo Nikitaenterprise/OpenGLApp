@@ -37,6 +37,8 @@ bool OmniShadowMap::init(GLuint _width, GLuint _height)
 		return false;
 	}
 
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	return true;
 }
 

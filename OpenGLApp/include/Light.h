@@ -101,10 +101,14 @@ public:
 
 	void setFlash(glm::vec3 _position, glm::vec3 _direction);
 
+	void toggle() { isOn = !isOn; };
+
 	~SpotLight();
 
 private:
 	glm::vec3 direction;
 
 	GLfloat edge, procEdge;
+
+	bool isOn;
 };
