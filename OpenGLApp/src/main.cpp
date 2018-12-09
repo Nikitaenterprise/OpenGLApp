@@ -238,6 +238,8 @@ void directionalShadowMapPass(DirectionalLight *_light)
 	uniformModel = directionalShadowShader.getModelLocation();
 	directionalShadowShader.setDirectionalLightTransform(&_light->calculateLightTransform());
 
+	directionalShadowShader.validate();
+
 	renderScene();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -259,6 +261,8 @@ void omniShadowMapPass(PointLight *_light)
 	glUniform3f(uniformOmniLightPosition, _light->getPosition().x, _light->getPosition().y, _light->getPosition().z);
 	glUniform1f(uniformFarPlane, _light->getFarPlane());
 	omniShadowShader.setLightMatrices(_light->calculateLightTransform());
+
+	omniShadowShader.validate();
 
 	renderScene();
 
@@ -286,15 +290,17 @@ void renderPass(glm::mat4 _projectionMatrix, glm::mat4 _viewMatrix)
 	glUniform3f(uniformEyePosition, camera.getCameraPosition().x, camera.getCameraPosition().y, camera.getCameraPosition().z);
 
 	shaderVector[0]->setDirectionalLight(&light);
-	shaderVector[0]->setPointLights(pointLights, pointLightCount);
-	shaderVector[0]->setSpotLights(spotLights, spotLightCount);
+	shaderVector[0]->setPointLights(pointLights, pointLightCount, 3, 0);
+	shaderVector[0]->setSpotLights(spotLights, spotLightCount, 3 + pointLightCount, pointLightCount);
 	shaderVector[0]->setDirectionalLightTransform(&light.calculateLightTransform());
 
-	light.getShadowMap()->read(GL_TEXTURE1);
-	shaderVector[0]->setTexture(0);
-	shaderVector[0]->setDirectionalShadowMap(1);
+	light.getShadowMap()->read(GL_TEXTURE2);
+	shaderVector[0]->setTexture(1);
+	shaderVector[0]->setDirectionalShadowMap(2);
 
-	//spotLights[0].setFlash(camera.getCameraPosition() - glm::vec3(0.0f, 0.5f, 0.0f), camera.getCameraDirection());
+	spotLights[0].setFlash(camera.getCameraPosition() - glm::vec3(0.0f, 0.5f, 0.0f), camera.getCameraDirection());
+
+	shaderVector[0]->validate();
 
 	renderScene();
 }
