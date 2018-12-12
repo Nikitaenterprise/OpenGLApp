@@ -3,11 +3,11 @@
 in vec4 fragmentPosition;
 
 uniform vec3 lightPosition;
-uniform float farPlanes;
+uniform float farPlane;
 
 void main()
 {
-	float distance = length(fragmentPosition.xyz - lightPosition);
-	distance /= farPlanes;	
-	gl_FragDepth = distance;
+	float Distance = length(fragmentPosition.xyz - lightPosition);
+	Distance /= farPlane;	
+	gl_FragDepth = Distance;
 }
