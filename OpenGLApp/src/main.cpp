@@ -21,6 +21,7 @@
 #include "Light.h"
 #include "Material.h"
 #include "Model.h"
+#include "Skybox.h"
 
 #include"assimp/Importer.hpp"
 
@@ -38,6 +39,7 @@ Shader omniShadowShader;
 
 Window mainWindow;
 Camera camera;
+Skybox skybox;
 
 Texture brickTexture, dirtTexture, whiteTexture;
 
@@ -272,6 +274,14 @@ void omniShadowMapPass(PointLight *_light)
 
 void renderPass(glm::mat4 _projectionMatrix, glm::mat4 _viewMatrix)
 {
+	glViewport(0, 0, 1280, 1024);
+
+	// Clear
+	glClearColor(1, 1, 1, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	skybox.drawSkybox(_viewMatrix, _projectionMatrix);
+
 	shaderVector[0]->useShader();
 	uniformModel = shaderVector[0]->getModelLocation();
 	uniformProjection = shaderVector[0]->getProjectionLocation();
@@ -279,12 +289,6 @@ void renderPass(glm::mat4 _projectionMatrix, glm::mat4 _viewMatrix)
 	uniformEyePosition = shaderVector[0]->getEyePosition();
 	uniformSpecularIntensity = shaderVector[0]->getSpecularIntensityLocation();
 	uniformShininess = shaderVector[0]->getShininessLocation();
-
-	glViewport(0, 0, 1280, 1024);
-
-	// Clear
-	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(_projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(_viewMatrix));
@@ -331,7 +335,7 @@ int main()
 	starDestroyer.loadModel("Models/Test.obj");
 
 	light = DirectionalLight(2048, 2048, 
-		glm::vec3(1.0f, 1.0f, 1.0f), 0.1f, 0.3f, glm::vec3(0.0f, -15.0f, -10.0f));
+		glm::vec3(0.9f, 0.9f, 1.0f), 0.1f, 0.8f, glm::vec3(0.0f, -15.0f, -10.0f));
 
 	pointLights[0] = PointLight(1024, 1024, 0.01f, 100.0f, 
 		glm::vec3(0.0f, 1.0f, 0.0f), 0.1f, 0.1f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
@@ -350,6 +354,16 @@ int main()
 		glm::vec3(0.0f, -1.5f, 0.0f), glm::vec3(-100.0f, -1.0f, 0.0f),
 		1.0f, 0.0f, 0.0f, 20.0f);
 	spotLightCount++;
+
+	std::vector<std::string> skyboxFaces;
+	skyboxFaces.push_back("Skybox/peaks_rt.tga");
+	skyboxFaces.push_back("Skybox/peaks_lf.tga");
+	skyboxFaces.push_back("Skybox/peaks_up.tga");
+	skyboxFaces.push_back("Skybox/peaks_dn.tga");
+	skyboxFaces.push_back("Skybox/peaks_bk.tga");
+	skyboxFaces.push_back("Skybox/peaks_ft.tga");
+
+	skybox = Skybox(skyboxFaces);
 
 	glm::mat4 projection = glm::perspective(glm::radians(60.0f), 
 		static_cast<GLfloat>(mainWindow.getBufferWidth())/ static_cast<GLfloat>(mainWindow.getBufferHeight()), 0.1f, 100.0f);

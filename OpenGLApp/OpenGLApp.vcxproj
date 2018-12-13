@@ -28,6 +28,7 @@
     <ClInclude Include="include\OmniShadowMap.h" />
     <ClInclude Include="include\Shader.h" />
     <ClInclude Include="include\ShadowMap.h" />
+    <ClInclude Include="include\Skybox.h" />
     <ClInclude Include="include\stb_image.h" />
     <ClInclude Include="include\Texture.h" />
     <ClInclude Include="include\Window.h" />
@@ -42,6 +43,7 @@
     <ClCompile Include="src\OmniShadowMap.cpp" />
     <ClCompile Include="src\Shader.cpp" />
     <ClCompile Include="src\ShadowMap.cpp" />
+    <ClCompile Include="src\Skybox.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Window.cpp" />
   </ItemGroup>
